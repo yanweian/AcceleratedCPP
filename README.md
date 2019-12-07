@@ -77,3 +77,26 @@ Record of learning CPP using << Accelerated C++ >>.
   * 输入与变量类型不一致
   * 输入时检测到硬件问题
 
+## 用中值代替平均值
+
+### `vector<double> homework`
+- 不需要预知数值的个数
+- 高效排序
+  - `sort(n,m)` 可以对`[n,m)`区间的元素进行**非递减**排序
+  - `vector.begin()` 指向第一个元素的位置
+  - `vector.end()` 指向紧跟着最后一个元素的后一个位置
+  ```c++
+  #include<vector>
+  #include<algorithm>
+  using namespace std;
+  vector<double> homework;
+  {
+    // 添加元素
+    homework.push_back(...);
+  }
+  sort(homework.begin(),homework.end());
+  ```
+### 一些深入的观察
+- 检测出异常，退出程序通常是一个正确的选择：**如果我们不知道做什么，那么我们还是退出比较好**
+- `size_t` 是无符号整数类型，根本不可能用来存储负值：普通整数和无符号整数在表达式中结合到一起时，普通整数会被转换成无符号整数。因此，`homework.size()-100` 的结果是无符号整数，且`>0`——即使是`homework.size()<100`
+- 使用这些库函数编写的程序的性能是足够的：c++标准对库的执行性能要求很高；C++是被设计来为注重性能的应用服务的
