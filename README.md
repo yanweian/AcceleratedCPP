@@ -208,3 +208,135 @@ sort(students.begin(),students.end(),compare);
 #### 源文件
 - 有必要在源文件中包含相应的头文件：检查声明和定义是否一致
 - 源文件中可以使用`using`
+
+
+## 使用顺序容器并分析字符串
+
+`vector` 是为了快速随机存取而被优化的。这种优化的代价是，在除了向量结尾的其他地方插入或删除元素的开销可能会很大
+
+`list` 是为了快速的插入和删除元素而被优化。可能使用了链表，结构更复杂。不支持索引操作
+
+### 迭代器
+迭代器是一种顺序访问的方式
+
+- 每一个标准容器都定义了两种相关的迭代器类型：
+  ```c++
+  // container-type 表示诸如vector这样的容器类型
+  container-type::const_iterator
+  container-type::iterator
+  ```
+  上述，如果我们需要修改存储在容器中的值，则使用`iterator`；否则，若仅需要读操作，则使用`const_iterator`
+
+- 访问迭代器指向的元素：
+  ```c++
+  // 由于.的优先级比*高，所以需要加括号
+  (*iter).name;
+  // 可以看出，迭代器可能类似于指针
+  iter->name;
+  ```
+- 非常量可以自动转换为常量
+  ```c++
+  vector<double> students;
+  // begin 返回一个iterator迭代器
+  vector<double>::const_iterator iter=students.begin();
+  ```
+- ```
+  iter=students.erase(iter);
+  ```
+  erase返回了一个迭代器，这个迭代器指向了紧跟在刚删掉的元素后的一个元素
+- `iter++` 或 `++iter`可以将迭代器推进到下一个元素
+
+这种删除操作，会改变容器的size，也可能使现有容器的迭代器失效，所以每次判断循环条件时，都需要重新执行 `container.size()` 或者 `container.end()`
+
+### vector 和 list 的区别
+#### vecto
+从`vector`中删除元素，会使指向这个元素和这个元素之后的迭代器失效；插入元素则会使指向整个容器的迭代器失效：删除元素，其后面的元素会向前移动位置；插入元素可能导致容器的空间重新分配。
+#### list
+对`list`进行`erase`和`push_back`并不会使指向其他元素的迭代器失效。
+
+`list`类的迭代器不支持完全随机访问，所以不能使用标准库的sort函数，而是提供了自己的sort函数，使用了一个优化算法来为存储在list中的数值排序
+```c++
+list<Student_info> students;
+// compare是一个谓词，用来提供Student_info类型的比较方法
+students.sort(compare);
+```
+
+#### 如果要比较两种方法对于某个问题的性能，实践出真知
+
+### 一些库函数使用总结
+
+#### 容器与迭代器
+标准库的设计很科学，对不同的容器有着同样的接口和语义。所有的顺序容器和 `string` 类型都支持如下操作：
+
+    note： string 类型可以看做一个存字符的容器
+```c++
+// 对于允许逆序访问其元素的容器，表示的是指向容器最后一个元素和位于第一个元素之前的那个位置的迭代器
+c.rbegin()
+c.rend()
+
+// 定义一个容器，如果给定c2，那么c是c2的一个复件；否则c为空
+container<T> c;
+container<T> c(c2);
+
+// 定义一个有n个元素的容器c，c的元素是t的复件
+container<T> c(n,t);
+
+// 定义一个容器，这个容器保存了位于区间[b,e)中的迭代器所指示元素的一个复件
+container<T> c(b,e);
+
+// 用容器c2的一个附件来替换容器c的内容
+c=c2;
+
+c.empty();
+c.size();
+
+// 复制位于区间[b,e)中的迭代器指示的元素，并且把他们插入到c中位于d之前的位置中
+c.insert(d,b,e);
+
+// it为迭代器，`b e`为迭代器
+// 该操作list是快的，vector和string会比较慢
+c.erase(it);
+c.erase(b,e);
+```
+#### 迭代器操作
+```c++
+// 两个迭代器指向的元素之间，判断相不相等
+b==c;
+b!=c;
+```
+
+#### string
+```c++
+// 创建区间[i，i+j)中索引的字符的一个复件
+s.substr(i,j);
+// 从 is（istream）中读一行输入并把它保存在s中
+getline(is,s);
+```
+
+#### vector
+```c++
+// 保留空间以存储n个元素，但不对这些元素进行初始化。该操作不会改变容器的size。它仅仅会影响为了响应插入操作的重复调用而分配内存的频率
+v.reverse(n);
+// 给v一个新的长度n。如果n比v.size()小，则在v中位于n后的元素会被删除。如果n比v.size()大，那剩余空间会被初始化值
+v.resize(n);
+```
+#### list
+```c++
+// cmp 为谓词，用法同 algorithm 中的sort
+l.sort();
+l.sort(cmp);
+```
+
+#### <cctype>
+`cctype`的第一个c，表示该库是从c语言继承来的。用于处理字符。
+```c++
+isspace(c);//判断空白字符
+isalpha(c);//判断字母
+isdigit(c);//判断数字
+isalnum(c);//判断字母或数字
+ispunct(c);//判断标点字符
+isupper(c);//判断大写字母
+islower(c);//判断小写字母
+toupper(c);//产生c的大写字母
+tolower(c);//产生c的小写字母
+```
