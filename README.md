@@ -340,3 +340,85 @@ islower(c);//判断小写字母
 toupper(c);//产生c的大写字母
 tolower(c);//产生c的小写字母
 ```
+
+## 使用库算法
+`泛型算法` 是一个不属于任何特定类别容器的算法。参数中，通常使用迭代器处理基本容器的元素。
+
+把一个重载函数作为一个参数直接传递给一个模板函数并不是一件容易的事：编译器并不知道我们所指的是哪一个版本的重载函数，而之所以会这样，是因为我们没有提供一个参数来让编译器选择一个版本。
+
+```c++
+string s;
+// 判读两个序列的值是否相等，前两个参数指明第一个序列的首尾，第三个参数指明第二个序列的头
+equal(s.begin(),s.end(),s.rbegin());
+```
+
+如果一个容器支持索引，那么它的迭代器也支持。
+```c++
+// bed是一个迭代器
+bed[-1] 等价于 *(bed-1)
+bed[size] 等价于 *(bed+size)
+```
+
+我们应该使用`c.empty()`函数来检查一个容器是否为空：对于某些容器来说，检查容器是否有元素，比精确的算出元素的个数具有更高的效率
+
+可以定义不同的分析函数，并将每个**分析函数作为参数**传递给某一个函数，下面的例子介绍了如何定义一个代表了函数的参数：
+```c++
+// 定义的例子
+void write_analysis(ostream& out,const string& name,
+double analysis(const vector<Student_info>&),const vector<Student_info>& did,const vector<Student_info>& didnt);
+```
+
+`<numeric>` 提供了许多数值运算的工具
+```c++
+// 表示f+ （[v.begin(),v.end())之间的值）
+accumulate(v.begin(),v.end(),f);
+```
+
+算法作用于容器的元素——它们并不是作用于容器
+
+`迭代器适配器`是产生迭代器的函数，最常见的是产生迭代器insert_iterators的适配器，这样的迭代器会让关联的容器动态地增长。这样的迭代器能被安全的用于一个复制算法的目的地。它们是在<iterator>中定义的：
+```c++
+back_inserter(c);
+front_inserter(c);
+```
+
+### `< algorithm >` 算法举例
+```c++
+// 把区间[b,e)中的元素的和加到t上并将值存在t中
+accumulate(b,e,t);
+// b,e,b2,e2为迭代器，t为元素值，p为谓词
+find(b,e,t);
+find_if(b,e,p);
+search(b,e,b2,e2);
+// d为迭代器适配器，b,e为迭代器，t为值，p为谓词
+// 完全复制
+copy(b,e,d);
+// 将不等于t的值复制到d
+remove_copy(b,e,d,t);
+// 将不满足p的值复制到d
+remove_copy_if(b,e,d,p);
+// 注意理解remove的含义
+// 使用不满足p的元素，覆盖满足p的元素
+remove_if(b,e,p);
+
+// 根据[b,e)中的元素，运行函数f，将f的结果存入d
+transform(b,e,d,f);
+
+// 以谓词p为基础，划分在域[b,e)中的元素，将满足p的元素置于容器头部，返回指向第一个不满足p的元素的迭代器（即分界线）；stable不改变各区域内原有的元素顺序
+partition(b,e,p);
+stable_partition(b,e,p);
+```
+
+### CTest
+cmake中的单元测试工具
+
+[github 例子项目 cmaketestblogexample1](https://github.com/a4z/cmaketestblogexample1)
+```c++
+// 主目录
+include(CTest)
+enable_testing()
+add_subdirectory(test)
+// 子目录test/
+add_executable(test1 test.cpp)
+add_test(test1 test1)
+```
