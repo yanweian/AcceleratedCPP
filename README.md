@@ -1,4 +1,4 @@
-# CPPLearning
+# AcceleratedCPP
 Record of learning CPP using 《 Accelerated C++ 》.
 
 [cpp 参考网站（中文）](https://zh.cppreference.com/w/首页)
